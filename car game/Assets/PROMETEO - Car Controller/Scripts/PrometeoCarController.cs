@@ -109,6 +109,12 @@ public class PrometeoCarController : MonoBehaviour
       [Space(20)]
       //[Header("CONTROLS")]
       [Space(10)]
+      public KeyCode throttleKey = KeyCode.W;
+      public KeyCode reverseKey = KeyCode.S;
+      public KeyCode turnLeftKey = KeyCode.A;
+      public KeyCode turnRightKey = KeyCode.D;
+      public KeyCode handbrakeKey = KeyCode.Space;
+      [Space(10)]
       //The following variables lets you to set up touch controls for mobile devices.
       public bool useTouchControls = false;
       public GameObject throttleButton;
@@ -161,6 +167,11 @@ public class PrometeoCarController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+      DecoupleWheelMeshAndCollider(ref frontLeftMesh, frontLeftCollider);
+      DecoupleWheelMeshAndCollider(ref frontRightMesh, frontRightCollider);
+      DecoupleWheelMeshAndCollider(ref rearLeftMesh, rearLeftCollider);
+      DecoupleWheelMeshAndCollider(ref rearRightMesh, rearRightCollider);
+
       //In this part, we set the 'carRigidbody' value with the Rigidbody attached to this
       //gameObject. Also, we define the center of mass of the car with the Vector3 given
       //in the inspector.
@@ -327,39 +338,39 @@ public class PrometeoCarController : MonoBehaviour
 
       }else{
 
-        if(Input.GetKey(KeyCode.W)){
+        if(Input.GetKey(throttleKey)){
           CancelInvoke("DecelerateCar");
           deceleratingCar = false;
           GoForward();
         }
-        if(Input.GetKey(KeyCode.S)){
+        if(Input.GetKey(reverseKey)){
           CancelInvoke("DecelerateCar");
           deceleratingCar = false;
           GoReverse();
         }
 
-        if(Input.GetKey(KeyCode.A)){
+        if(Input.GetKey(turnLeftKey)){
           TurnLeft();
         }
-        if(Input.GetKey(KeyCode.D)){
+        if(Input.GetKey(turnRightKey)){
           TurnRight();
         }
-        if(Input.GetKey(KeyCode.Space)){
+        if(Input.GetKey(handbrakeKey)){
           CancelInvoke("DecelerateCar");
           deceleratingCar = false;
           Handbrake();
         }
-        if(Input.GetKeyUp(KeyCode.Space)){
+        if(Input.GetKeyUp(handbrakeKey)){
           RecoverTraction();
         }
-        if((!Input.GetKey(KeyCode.S) && !Input.GetKey(KeyCode.W))){
+        if((!Input.GetKey(reverseKey) && !Input.GetKey(throttleKey))){
           ThrottleOff();
         }
-        if((!Input.GetKey(KeyCode.S) && !Input.GetKey(KeyCode.W)) && !Input.GetKey(KeyCode.Space) && !deceleratingCar){
+        if((!Input.GetKey(reverseKey) && !Input.GetKey(throttleKey)) && !Input.GetKey(handbrakeKey) && !deceleratingCar){
           InvokeRepeating("DecelerateCar", 0f, 0.1f);
           deceleratingCar = true;
         }
-        if(!Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.D) && steeringAxis != 0f){
+        if(!Input.GetKey(turnLeftKey) && !Input.GetKey(turnRightKey) && steeringAxis != 0f){
           ResetSteeringAngle();
         }
 
@@ -768,6 +779,57 @@ public class PrometeoCarController : MonoBehaviour
         rearRightCollider.sidewaysFriction = RRwheelFriction;
 
         driftingAxis = 0f;
+      }
+    }
+
+    void DecoupleWheelMeshAndCollider(ref GameObject meshGo, WheelCollider collider)
+    {
+      if (meshGo == null || collider == null) return;
+
+      if (meshGo == collider.gameObject)
+      {
+        GameObject visualGo = new GameObject(meshGo.name + "_Visual");
+        visualGo.transform.SetParent(meshGo.transform, false);
+        visualGo.transform.localPosition = Vector3.zero;
+        visualGo.transform.localRotation = Quaternion.identity;
+        visualGo.transform.localScale = Vector3.one;
+
+        MeshFilter meshFilter = meshGo.GetComponent<MeshFilter>();
+        if (meshFilter != null)
+        {
+          MeshFilter newFilter = visualGo.AddComponent<MeshFilter>();
+          newFilter.sharedMesh = meshFilter.sharedMesh;
+          Destroy(meshFilter);
+        }
+
+        MeshRenderer meshRenderer = meshGo.GetComponent<MeshRenderer>();
+        if (meshRenderer != null)
+        {
+          MeshRenderer newRenderer = visualGo.AddComponent<MeshRenderer>();
+          newRenderer.sharedMaterials = meshRenderer.sharedMaterials;
+          newRenderer.shadowCastingMode = meshRenderer.shadowCastingMode;
+          newRenderer.receiveShadows = meshRenderer.receiveShadows;
+          newRenderer.lightProbeUsage = meshRenderer.lightProbeUsage;
+          newRenderer.reflectionProbeUsage = meshRenderer.reflectionProbeUsage;
+          Destroy(meshRenderer);
+        }
+
+        meshGo = visualGo;
+      }
+    }
+
+    void CorrectColliderOrientation(WheelCollider collider)
+    {
+      if (collider == null) return;
+
+      Vector3 localForward = transform.InverseTransformDirection(collider.transform.forward);
+      if (localForward.z < 0)
+      {
+        collider.transform.localRotation = Quaternion.Euler(0, 180, 0);
+      }
+      else
+      {
+        collider.transform.localRotation = Quaternion.identity;
       }
     }
 
