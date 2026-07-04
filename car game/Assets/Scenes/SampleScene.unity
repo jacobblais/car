@@ -582,7 +582,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 4da0154ae27804e7594b88e8483a1264, type: 3}
       propertyPath: m_Name
-      value: uploads_files_6316639_Corvette+C7+Blacked+Out
+      value: Corvette
       objectReference: {fileID: 0}
     - target: {fileID: 5572587306228295280, guid: 4da0154ae27804e7594b88e8483a1264, type: 3}
       propertyPath: m_LocalPosition.x
@@ -775,14 +775,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0fefceefe666bb4682b272ec8c5bdd0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PrometeoCarController
-  maxSpeed: 90
+  maxSpeed: 190
   maxReverseSpeed: 45
-  accelerationMultiplier: 2
-  maxSteeringAngle: 27
-  steeringSpeed: 0.5
+  accelerationMultiplier: 10
+  maxSteeringAngle: 45
+  steeringSpeed: 1
   brakeForce: 350
   decelerationMultiplier: 2
-  handbrakeDriftMultiplier: 5
+  handbrakeDriftMultiplier: 10
   bodyMassCenter: {x: 0, y: 0, z: 0}
   frontLeftMesh: {fileID: 689782206}
   frontLeftCollider: {fileID: 689782207}
@@ -1174,6 +1174,10 @@ PrefabInstance:
     - target: {fileID: 642287924342879162, guid: 79d0ca8b77e301442afdb49f102e8aed, type: 3}
       propertyPath: m_Name
       value: Prometheus
+      objectReference: {fileID: 0}
+    - target: {fileID: 642287924342879162, guid: 79d0ca8b77e301442afdb49f102e8aed, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
